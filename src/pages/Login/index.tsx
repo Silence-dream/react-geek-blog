@@ -1,14 +1,33 @@
 import './index.scss';
 
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Checkbox, Form, Input, message } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
-import logo from '../../assets/logo.png';
+import logo from '@/assets/logo.png';
+import { AppDispatch, AppStore } from '@/store';
+import { login } from '@/store/actions';
 
 const Login = () => {
-  const onFinish = (values: { mobile: string; code: string; remember: boolean }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const history = useHistory();
+  const store = useSelector((state: AppStore) => state.user);
+  const onFinish = async (values: {
+    mobile: string;
+    code: string;
+    remember: boolean;
+  }) => {
     // 获取传入的值
     console.log('Success:', values);
+    const { mobile, code } = values;
+    try {
+      await dispatch(login(mobile, code));
+      history.replace('/home');
+    } catch (e) {
+      message.error('登录失败');
+    }
+    console.log(store);
   };
 
   const onFinishFailed = (errorInfo: any) => {
