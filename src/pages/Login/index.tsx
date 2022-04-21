@@ -3,7 +3,7 @@ import './index.scss';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 import logo from '@/assets/logo.png';
 import { AppDispatch, AppStore } from '@/store';
@@ -12,6 +12,7 @@ import { login } from '@/store/actions';
 const Login = () => {
   const dispatch = useDispatch<AppDispatch>();
   const history = useHistory();
+  const location = useLocation();
   const store = useSelector((state: AppStore) => state.user);
   const onFinish = async (values: {
     mobile: string;
@@ -19,11 +20,13 @@ const Login = () => {
     remember: boolean;
   }) => {
     // 获取传入的值
-    console.log('Success:', values);
     const { mobile, code } = values;
     try {
       await dispatch(login(mobile, code));
+      // 跳转路由
       history.replace('/home');
+      message.success('登录成功');
+      // history.replace(location?.state?.returnUrl || '/');
     } catch (e) {
       message.error('登录失败');
     }
