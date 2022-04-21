@@ -5,7 +5,7 @@ import {
   SolutionOutlined,
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popconfirm } from 'antd';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, Redirect, Route, Switch, useHistory, useLocation } from 'react-router-dom';
 

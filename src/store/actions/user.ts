@@ -1,5 +1,5 @@
 import { AppDispatch } from '@/store';
-import { clearToken, getToken, setToken } from '@/utils';
+import { clearToken, setToken } from '@/utils';
 import { http } from '@/utils';
 
 export const login = (mobile: string, code: string) => {
@@ -33,11 +33,7 @@ export interface UserInfoI {
 // 获取用户信息
 export const getUserInfo = () => {
   return async (dispatch: AppDispatch) => {
-    const res = await http.get<any, UserInfoI>('/user/profile', {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
+    const res = await http.get<any, UserInfoI>('/user/profile');
     dispatch({ type: 'user/setUserInfo', payload: res });
   };
 };

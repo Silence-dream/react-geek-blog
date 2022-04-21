@@ -2,17 +2,16 @@ import './index.scss';
 
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, message } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import logo from '@/assets/logo.png';
-import { AppDispatch, AppStore } from '@/store';
+import { AppDispatch } from '@/store';
 import { login } from '@/store/actions';
 
 const Login = () => {
   const dispatch = useDispatch<AppDispatch>();
   const history = useHistory();
-  const store = useSelector((state: AppStore) => state.user);
   const onFinish = async (values: {
     mobile: string;
     code: string;
@@ -23,13 +22,12 @@ const Login = () => {
     try {
       await dispatch(login(mobile, code));
       // 跳转路由
-      history.replace('/home');
+      history.replace('/');
       message.success('登录成功');
       // history.replace(location?.state?.returnUrl || '/');
     } catch (e) {
       message.error('登录失败');
     }
-    console.log(store);
   };
 
   const onFinishFailed = (errorInfo: any) => {

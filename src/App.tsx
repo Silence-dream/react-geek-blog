@@ -1,20 +1,21 @@
 import './App.scss';
 
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { Route, Router, Switch } from 'react-router-dom';
 
 import AuthRoute from '@/components/AuthRoute';
 import Layout from '@/pages/Layout';
 import Login from '@/pages/Login';
+import { customHistory } from '@/utils/history';
 function App() {
   return (
-    <BrowserRouter>
+    <Router history={customHistory}>
       <div className="app">
         <Switch>
           <Route path="/login" component={Login}></Route>
           <AuthRoute path="/" component={Layout}></AuthRoute>
         </Switch>
       </div>
-    </BrowserRouter>
+    </Router>
   );
 }
 
