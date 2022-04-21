@@ -3,7 +3,7 @@ import './index.scss';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import logo from '@/assets/logo.png';
 import { AppDispatch, AppStore } from '@/store';
@@ -12,7 +12,6 @@ import { login } from '@/store/actions';
 const Login = () => {
   const dispatch = useDispatch<AppDispatch>();
   const history = useHistory();
-  const location = useLocation();
   const store = useSelector((state: AppStore) => state.user);
   const onFinish = async (values: {
     mobile: string;

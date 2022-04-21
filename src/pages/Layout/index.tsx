@@ -1,5 +1,3 @@
-import './index.scss';
-
 import {
   FileWordOutlined,
   LogoutOutlined,
@@ -7,23 +5,31 @@ import {
   SolutionOutlined,
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popconfirm } from 'antd';
+import { Link, Redirect, Route, Switch } from 'react-router-dom';
+
+import Article from '@/pages/Article';
+import Dashboard from '@/pages/Dashboard';
+import NotFond from '@/pages/NotFond';
+import Publish from '@/pages/Publish';
+
+import styles from './index.module.scss';
 
 const { Header, Sider, Content } = Layout;
 
 const GeekLayout = () => {
   return (
-    <Layout className="geek-layout">
+    <Layout className={styles.root}>
       <Sider width={148}>
         <div className="logo">GEEK</div>
         <Menu defaultSelectedKeys={['1']} mode="inline" theme="dark">
           <Menu.Item icon={<PieChartOutlined />} key="1">
-            数据面板
+            <Link to="/dashboard">数据面板</Link>
           </Menu.Item>
           <Menu.Item icon={<SolutionOutlined />} key="2">
-            内容管理
+            <Link to="/article">内容管理</Link>
           </Menu.Item>
           <Menu.Item icon={<FileWordOutlined />} key="3">
-            发布文章
+            <Link to="/publish">发布文章</Link>
           </Menu.Item>
         </Menu>
       </Sider>
@@ -44,7 +50,19 @@ const GeekLayout = () => {
             </Popconfirm>
           </div>
         </Header>
-        <Content>内容</Content>
+        <Content>
+          {/*嵌套路由渲染*/}
+          <Switch>
+            <Route path="/" exact render={() => <Redirect to="/dashboard" />}></Route>
+            <Route path="/dashboard" component={Dashboard} />
+            <Route path="/article" component={Article} />
+            <Route path="/publish/:id?" component={Publish} />
+            {/* 404 页面*/}
+            <Route>
+              <NotFond />
+            </Route>
+          </Switch>
+        </Content>
       </Layout>
     </Layout>
   );
