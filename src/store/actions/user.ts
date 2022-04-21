@@ -1,7 +1,6 @@
 import { AppDispatch } from '@/store';
 import { clearToken, setToken } from '@/utils';
 import { http } from '@/utils';
-
 export const login = (mobile: string, code: string) => {
   return async (dispatch: AppDispatch) => {
     // https://docs.shanyuhai.top/frontend/typescript/change-axios-response-type.html
