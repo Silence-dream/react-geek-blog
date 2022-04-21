@@ -1,10 +1,12 @@
+import { UserInfoI } from '@/store/actions';
 import { getToken } from '@/utils';
 
-interface UserStateI {
+export interface UserStateI {
   token: string;
+  useInfo: UserInfoI;
 }
 // 登录功能，只需要存储 token 即可，所以，状态默认值为：''
-const initialState: UserStateI = {
+const initialState: Partial<UserStateI> = {
   token: getToken(),
 };
 
@@ -15,6 +17,8 @@ const user = (state = initialState, action: any) => {
         ...state,
         token: action.payload,
       };
+    case 'user/setUserInfo':
+      return { ...state, useInfo: action.payload };
     default:
       return state;
   }
