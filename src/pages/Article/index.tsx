@@ -11,18 +11,18 @@ import {
   message,
   Modal,
   Radio,
-  Select,
   Space,
   Table,
   Tag,
 } from 'antd';
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 import defaultImg from '@/assets/error.png';
+import Channel from '@/components/Channel';
 import { AppDispatch, AppStore } from '@/store';
-import { delArticle, getArticles, getChannels } from '@/store/actions';
+import { delArticle, getArticles } from '@/store/actions';
 import { ArticleStateI } from '@/store/reducers/article';
 
 import styles from './index.module.scss';
@@ -36,6 +36,7 @@ const statusLabel = [
 const Article = () => {
   const dispatch = useDispatch<AppDispatch>();
   const state: ArticleStateI = useSelector((state: AppStore) => state.article);
+  const history = useHistory();
 
   // 请求参数
   // 使用 Ref 来保存数据可以避免页面的重复渲染
@@ -49,6 +50,7 @@ const Article = () => {
   });
   // 表单验证
   const onFinish = (value: any) => {
+    console.log(value);
     // 请求参数对象
     params.current.status = value.status;
     params.current.channel_id = value.channel_id;
@@ -65,12 +67,17 @@ const Article = () => {
     console.log(params);
   };
   useEffect(() => {
-    // 获取频道
-    dispatch(getChannels());
     // 获取文章
     dispatch(getArticles());
   }, []);
-  const editArticleFn = (recordId: string) => {
+  // 编辑文章
+  const eidtArticleFn = (id: string) => {
+    history.push({
+      pathname: `/publish/${id}`,
+    });
+  };
+  // 删除文章
+  const delArticleFn = (recordId: string) => {
     console.log(recordId);
     // 确认框
     Modal.confirm({
@@ -141,11 +148,15 @@ const Article = () => {
       key: 'action',
       render: (record: any) => (
         <Space size="middle">
-          <Button type="link" icon={<EditOutlined />} />
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            onClick={() => eidtArticleFn(record.id)}
+          />
           <Button
             type="link"
             icon={<DeleteOutlined />}
-            onClick={() => editArticleFn(record.id)}
+            onClick={() => delArticleFn(record.id)}
           />
         </Space>
       ),
@@ -176,13 +187,7 @@ const Article = () => {
             </Radio.Group>
           </Form.Item>
           <Form.Item label="频道：" name="channel_id">
-            <Select style={{ width: 288 }}>
-              {state.channels.map((item) => (
-                <Select.Option key={item.id} value={item.id}>
-                  {item.name}
-                </Select.Option>
-              ))}
-            </Select>
+            <Channel width={288} />
           </Form.Item>
           <Form.Item label="日期：" name="dateArr">
             <DatePicker.RangePicker />

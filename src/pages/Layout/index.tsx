@@ -27,6 +27,10 @@ const GeekLayout = () => {
   let state = useSelector((state: AppStore) => state.user);
   // 菜单高亮
   let selectedKey = location.pathname;
+  // 匹配 public/xxx
+  if (selectedKey.startsWith('/publish')) {
+    selectedKey = '/publish';
+  }
   // 页面加载获取用户信息
   useEffect(() => {
     try {
