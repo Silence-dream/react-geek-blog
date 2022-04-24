@@ -58,3 +58,15 @@ export const delArticle = (id: string) => {
     dispatch({ type: 'article/delArticle', payload: res });
   };
 };
+// 添加文章
+interface addArticleI {
+  title: string;
+  content: string;
+  cover: { type: string | number; images: any[] | string };
+  channel_id: number;
+}
+export const addArticle = (data: addArticleI, draft?: boolean) => {
+  return async () => {
+    await http.post(`/mp/articles?draft=${draft}`, data);
+  };
+};
