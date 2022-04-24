@@ -50,3 +50,11 @@ export const getArticles = (
     dispatch({ type: 'article/getArticleList', payload: res });
   };
 };
+
+// 删除文章
+export const delArticle = (id: string) => {
+  return async (dispatch: AppDispatch) => {
+    let res = await http.delete<any>(`/mp/articles/${id}`);
+    dispatch({ type: 'article/delArticle', payload: res });
+  };
+};

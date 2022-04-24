@@ -8,6 +8,8 @@ import {
   DatePicker,
   Form,
   Image,
+  message,
+  Modal,
   Radio,
   Select,
   Space,
@@ -20,7 +22,7 @@ import { Link } from 'react-router-dom';
 
 import defaultImg from '@/assets/error.png';
 import { AppDispatch, AppStore } from '@/store';
-import { getArticles, getChannels } from '@/store/actions';
+import { delArticle, getArticles, getChannels } from '@/store/actions';
 import { ArticleStateI } from '@/store/reducers/article';
 
 import styles from './index.module.scss';
@@ -68,6 +70,21 @@ const Article = () => {
     // 获取文章
     dispatch(getArticles());
   }, []);
+  const editArticleFn = (recordId: string) => {
+    console.log(recordId);
+    // 确认框
+    Modal.confirm({
+      title: '您确认删除该篇文章吗？',
+      onOk: async () => {
+        // 删除
+        await dispatch(delArticle(recordId));
+        // 更新列表数据
+        await dispatch(getArticles(params.current));
+        // 提示
+        message.success('删除成功');
+      },
+    });
+  };
   // 列表配置
   const columns = [
     {
@@ -122,10 +139,14 @@ const Article = () => {
     {
       title: '操作',
       key: 'action',
-      render: () => (
+      render: (record: any) => (
         <Space size="middle">
           <Button type="link" icon={<EditOutlined />} />
-          <Button type="link" icon={<DeleteOutlined />} />
+          <Button
+            type="link"
+            icon={<DeleteOutlined />}
+            onClick={() => editArticleFn(record.id)}
+          />
         </Space>
       ),
     },
@@ -188,10 +209,10 @@ const Article = () => {
             current: state.articleList.page,
             pageSize: state.articleList.per_page,
             total: state.articleList.total_count,
-            onChange: (page: number, pageSizeOptions) => {
+            onChange: async (page: number, pageSizeOptions) => {
               params.current.page = page;
               params.current.per_page = pageSizeOptions;
-              dispatch(getArticles(params.current));
+              await dispatch(getArticles(params.current));
             },
           }}
         ></Table>
