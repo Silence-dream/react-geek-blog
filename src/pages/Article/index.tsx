@@ -7,31 +7,66 @@ import {
   Card,
   DatePicker,
   Form,
+  Image,
   Radio,
   Select,
   Space,
   Table,
+  Tag,
 } from 'antd';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import defaultImg from '@/assets/error.png';
 import { AppDispatch, AppStore } from '@/store';
-import { getChannels } from '@/store/actions';
+import { getArticles, getChannels } from '@/store/actions';
 import { ArticleStateI } from '@/store/reducers/article';
 
 import styles from './index.module.scss';
-
+// 状态常量数据
+const statusLabel = [
+  { label: '草稿', color: 'default' },
+  { label: '待审核', color: 'blue' },
+  { label: '已通过', color: 'green' },
+  { label: '已拒绝', color: 'red' },
+];
 const Article = () => {
   const dispatch = useDispatch<AppDispatch>();
   const state: ArticleStateI = useSelector((state: AppStore) => state.article);
+
+  // 请求参数
+  // 使用 Ref 来保存数据可以避免页面的重复渲染
+  const params = useRef({
+    status: undefined,
+    channel_id: undefined,
+    begin_pubdate: undefined,
+    end_pubdate: undefined,
+    page: 1,
+    per_page: 20,
+  });
   // 表单验证
   const onFinish = (value: any) => {
-    console.log(value);
+    // 请求参数对象
+    params.current.status = value.status;
+    params.current.channel_id = value.channel_id;
+    if (value.dateArr) {
+      // 日期数据默认是moment对象
+      params.current.begin_pubdate = value.dateArr[0].format('YYYY-MM-DD HH:mm:ss');
+      params.current.end_pubdate = value.dateArr[1].format('YYYY-MM-DD HH:mm:ss');
+    } else {
+      params.current.begin_pubdate = undefined;
+      params.current.end_pubdate = undefined;
+    }
+    params.current.page = 1;
+    dispatch(getArticles(params.current));
+    console.log(params);
   };
   useEffect(() => {
     // 获取频道
     dispatch(getChannels());
+    // 获取文章
+    dispatch(getArticles());
   }, []);
   // 列表配置
   const columns = [
@@ -39,7 +74,16 @@ const Article = () => {
       title: '封面',
       dataIndex: 'cover',
       key: 'cover',
-      render: () => '自定义封面',
+      render: (cover: any) => {
+        return (
+          <Image
+            width={200}
+            height={150}
+            style={{ objectFit: 'cover' }}
+            src={cover?.images?.[0] || defaultImg}
+          />
+        );
+      },
     },
     {
       title: '标题',
@@ -50,7 +94,10 @@ const Article = () => {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      render: () => '自定义状态',
+      render: (status: 0 | 1 | 2 | 3) => {
+        const info = statusLabel[status];
+        return <Tag color={info.color}>{info.label}</Tag>;
+      },
     },
     {
       title: '发布时间',
@@ -128,9 +175,26 @@ const Article = () => {
         </Form>
       </Card>
       {/* 筛选结果 */}
-      <Card title={`根据筛选条件共查询到 100 条结果：`} style={{ marginTop: 24 }}>
+      <Card
+        title={`根据筛选条件共查询到 ${state.articleList.total_count} 条结果：`}
+        style={{ marginTop: 24 }}
+      >
         放置表格组件
-        <Table columns={columns} dataSource={[]}></Table>
+        <Table
+          rowKey="id"
+          columns={columns}
+          dataSource={state.articleList.results}
+          pagination={{
+            current: state.articleList.page,
+            pageSize: state.articleList.per_page,
+            total: state.articleList.total_count,
+            onChange: (page: number, pageSizeOptions) => {
+              params.current.page = page;
+              params.current.per_page = pageSizeOptions;
+              dispatch(getArticles(params.current));
+            },
+          }}
+        ></Table>
       </Card>
     </div>
   );
