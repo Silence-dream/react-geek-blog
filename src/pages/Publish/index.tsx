@@ -70,6 +70,7 @@ const Publish = () => {
       // 添加提交
       await dispatch(addArticle(data, draft));
     }
+    message.success('保存成功');
     history.push('/article');
   };
   // 回显数据
@@ -98,7 +99,15 @@ const Publish = () => {
     };
     initialFormValues();
   }, [form, params]);
-
+  // 存入草稿
+  const saveDarft = async () => {
+    try {
+      const values = await form.validateFields();
+      onFinish(values, true);
+    } catch (e) {
+      console.log(e);
+    }
+  };
   return (
     <div className={styles.root}>
       <Card
@@ -173,7 +182,7 @@ const Publish = () => {
               <Button type="primary" htmlType={'submit'}>
                 {params.id ? '修改' : '发布'}文章
               </Button>
-              <Button>存入草稿</Button>
+              <Button onClick={saveDarft}>存入草稿</Button>
             </Space>
           </Form.Item>
         </Form>
