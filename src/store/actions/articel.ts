@@ -58,15 +58,35 @@ export const delArticle = (id: string) => {
     dispatch({ type: 'article/delArticle', payload: res });
   };
 };
-// 添加文章
-interface addArticleI {
+interface ArticleI {
   title: string;
   content: string;
   cover: { type: string | number; images: any[] | string };
   channel_id: number;
 }
-export const addArticle = (data: addArticleI, draft?: boolean) => {
+// 添加文章
+export const addArticle = (data: ArticleI, draft?: boolean) => {
   return async () => {
     await http.post(`/mp/articles?draft=${draft}`, data);
+  };
+};
+
+// 获取文章
+export const getArticle = (id: number | string) => {
+  return async () => {
+    const data = await http.get(`/mp/articles/${id}`);
+    return data;
+  };
+};
+
+// 修改文章
+/**
+ *
+ * @param data
+ * @param draft 是否存为草稿 true: 存为草稿 false: 否
+ */
+export const editArticle = (data: ArticleI & { id: string }, draft: boolean) => {
+  return async () => {
+    await http.put(`/mp/articles/${data.id}?draft=${draft}`, data);
   };
 };

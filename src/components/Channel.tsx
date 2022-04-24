@@ -6,7 +6,7 @@ import { AppDispatch, AppStore } from '@/store';
 import { getChannels } from '@/store/actions';
 import { ArticleStateI } from '@/store/reducers/article';
 
-export default function Channel({ width, onChange }: any) {
+export default function Channel({ width, value, onChange }: any) {
   const state: ArticleStateI = useSelector((state: AppStore) => state.article);
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
@@ -17,6 +17,7 @@ export default function Channel({ width, onChange }: any) {
     <Select
       style={{ width }}
       placeholder={'请选择所属频道'}
+      value={value}
       onChange={(e) => onChange(e)}
     >
       {state.channels.map((item) => (

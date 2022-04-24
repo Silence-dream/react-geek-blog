@@ -15,11 +15,11 @@ import {
 import { useEffect, useState } from 'react';
 import ReactQuill from 'react-quill';
 import { useDispatch } from 'react-redux';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 
 import Channel from '@/components/Channel';
 import { AppDispatch } from '@/store';
-import { addArticle, getChannels } from '@/store/actions';
+import { addArticle, editArticle, getArticle, getChannels } from '@/store/actions';
 
 import styles from './index.module.scss';
 const Publish = () => {
@@ -42,26 +42,63 @@ const Publish = () => {
   };
 
   // form 表单
-  const onFinish = async (values: {
-    channel_id: number;
-    content: string;
-    title: string;
-  }) => {
+  const onFinish = async (
+    values: {
+      channel_id: number;
+      content: string;
+      title: string;
+    },
+    draft = false,
+  ) => {
     if (type !== fileList.length) {
       return message.warning('请按照选择的封面类型上传图片');
     }
     console.log(fileList);
     // 发布文章数据结构
-    let data = {
+    let data: any = {
       ...values,
       cover: {
         type,
-        images: fileList.map((item: any) => item.response.data.url),
+        images: fileList.map((item: any) => item?.response?.data?.url || item.url),
       },
     };
-    await dispatch(addArticle(data));
+    if (params.id) {
+      // 修改提交
+      data.id = params.id;
+      await dispatch(editArticle(data, draft));
+    } else {
+      // 添加提交
+      await dispatch(addArticle(data, draft));
+    }
     history.push('/article');
   };
+  // 回显数据
+  const [form] = Form.useForm();
+  // 获取页面参数
+  const params = useParams<{ id: string }>();
+  useEffect(() => {
+    const initialFormValues = async () => {
+      if (params.id) {
+        // 回显数据
+        const { title, channel_id, content, cover }: any = await dispatch(
+          getArticle(params.id),
+        );
+        console.log(channel_id);
+        form.setFieldsValue({ title, channel_id, content });
+        setType(cover.type);
+        // fileList [{},...] 对象中有url就可以显示图片
+        setFileList(cover.images.map((item: any) => ({ url: item })));
+      } else {
+        // 编辑状态====>发布状态
+        // 重置数据
+        form.resetFields();
+        setType(1);
+        setFileList([]);
+      }
+    };
+    initialFormValues();
+  }, [form, params]);
+
   return (
     <div className={styles.root}>
       <Card
@@ -77,7 +114,7 @@ const Publish = () => {
           </Breadcrumb>
         }
       >
-        <Form labelCol={{ span: 4 }} onFinish={onFinish}>
+        <Form form={form} labelCol={{ span: 4 }} onFinish={onFinish}>
           <Form.Item
             label="文章标题："
             name="title"
@@ -134,8 +171,9 @@ const Publish = () => {
           <Form.Item wrapperCol={{ offset: 4 }}>
             <Space>
               <Button type="primary" htmlType={'submit'}>
-                发表文章
+                {params.id ? '修改' : '发布'}文章
               </Button>
+              <Button>存入草稿</Button>
             </Space>
           </Form.Item>
         </Form>
