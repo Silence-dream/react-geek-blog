@@ -5,7 +5,7 @@ import store from '@/store';
 import { logout } from '@/store/actions';
 import { customHistory } from '@/utils/history';
 const http = axios.create({
-  baseURL: 'http://toutiao.itheima.net/v1_0',
+  baseURL: 'https://toutiao.itheima.net/v1_0',
   timeout: 5000,
 });
 // 响应拦截器
